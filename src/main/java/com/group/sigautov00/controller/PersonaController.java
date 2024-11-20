@@ -32,7 +32,7 @@ public class PersonaController {
             List<Persona> personas = personaService.getAll();
             return new ResponseEntity<List<Persona>>(personas, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("Error fetching personas", e);
+            logger.error("Error en personas api", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
