@@ -13,11 +13,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "persona")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Persona {
@@ -53,10 +55,10 @@ public class Persona {
     @Column(nullable = false)
     private Long telefono;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = true, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false)
+    @Column(nullable = true )
     private LocalDateTime updatedAt = LocalDateTime.now();
 
 }
