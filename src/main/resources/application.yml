@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: sigautov00 - 1
+
+  config:
+    import: optional:file:.env[.properties]
+
+  security:
+    user:
+      name: ${SPRING_SECURITY_USER_NAME}
+      password: ${SPRING_SECURITY_USER_PASSWORD}
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
