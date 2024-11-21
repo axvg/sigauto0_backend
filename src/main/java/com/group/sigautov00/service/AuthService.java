@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import com.group.sigautov00.dto.AuthResponseDTO;
 import com.group.sigautov00.dto.LoginRequestDTO;
 import com.group.sigautov00.dto.RegisterRequestDTO;
+import com.group.sigautov00.entity.Cliente;
 import com.group.sigautov00.entity.Genero;
 import com.group.sigautov00.entity.Persona;
 import com.group.sigautov00.entity.Usuario;
+import com.group.sigautov00.repository.ClienteRepository;
 import com.group.sigautov00.repository.PersonaRepository;
 import com.group.sigautov00.repository.UsuarioRepository;
 import com.group.sigautov00.util.JwtUtil;
@@ -21,21 +23,14 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-private final UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
     private final PersonaRepository personaRepository;
+    private final ClienteRepository clienteRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtService;
     
     public AuthResponseDTO register(RegisterRequestDTO request) {
         // Create Persona
-        // console .log request
-        System.out.println(request);
-
-        // log the request in console
-
-
-
-
         var persona = Persona.builder()
             .email(request.getEmail())
             .nombres(request.getNombres())
@@ -46,6 +41,8 @@ private final UsuarioRepository usuarioRepository;
             .sexo(Genero.valueOf(request.getSexo()))
             .numeroDocumento(request.getNumeroDocumento())
             .telefono(request.getTelefono())
+            .createdAt(java.time.LocalDateTime.now())
+            .updatedAt(java.time.LocalDateTime.now())
             .build();
         
         personaRepository.save(persona);
@@ -57,7 +54,17 @@ private final UsuarioRepository usuarioRepository;
             .build();
         
         usuarioRepository.save(usuario);
+
+        // Create Cliente
+        var cliente = Cliente.builder()
+            .persona(persona)
+            .estado(true)
+            .createdAt(java.time.LocalDateTime.now())
+            .updatedAt(java.time.LocalDateTime.now())
+            .build();
         
+        clienteRepository.save(cliente);
+
         var token = jwtService.generateToken(usuario);
         return AuthResponseDTO.builder()
             .token(token)
