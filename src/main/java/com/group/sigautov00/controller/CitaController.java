@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,17 @@ public class CitaController {
             List<Cita> citas = citaService.getAllCitas();
             return new ResponseEntity<>(citas, HttpStatus.OK);
         } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/cliente/{idCliente}")
+    public ResponseEntity<List<Cita>> getCitasByCliente(@PathVariable Long idCliente) {
+        try {
+            List<Cita> citas = citaService.getCitasByCliente(idCliente);
+            return new ResponseEntity<>(citas, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error al conseguir citas por cliente id", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
