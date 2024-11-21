@@ -73,10 +73,10 @@ public class AuthService {
     
     public AuthResponseDTO login(LoginRequestDTO request) {
         var usuario = usuarioRepository.findByPersonaEmail(request.getEmail())
-            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("Email no encontrado"));
             
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())) {
-            throw new BadCredentialsException("Invalid password");
+            throw new BadCredentialsException("Contrasena incorrecta");
         }
         
         var token = jwtService.generateToken(usuario);
