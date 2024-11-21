@@ -30,6 +30,14 @@ public class AuthService {
     private final JwtUtil jwtService;
     
     public AuthResponseDTO register(RegisterRequestDTO request) {
+        // checking...
+        if (personaRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Hay un usuario registrado con ese email");
+        }
+        if (personaRepository.existsByNumeroDocumento(request.getNumeroDocumento())) {
+            throw new IllegalArgumentException("Hay un usuario registrado con ese nro de documento");
+        }
+
         // Create Persona
         var persona = Persona.builder()
             .email(request.getEmail())
