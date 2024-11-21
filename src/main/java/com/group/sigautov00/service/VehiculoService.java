@@ -29,6 +29,12 @@ public class VehiculoService {
         return vehiculoRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    public List<VehiculoDTO> getVehiculosByClienteId(Long clienteId) {
+        // Cliente cliente = clienteRepository.findById(clienteId)
+        //         .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        return vehiculoRepository.findByClienteIdCliente(clienteId).stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
     public VehiculoDTO createVehiculo(VehiculoDTO vehiculoDTO) {
         logger.info("Creating vehiculo with placa: {}", vehiculoDTO.toString());
         try {
