@@ -11,14 +11,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-// import jakarta.websocket.ClientEndpoint;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cita")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cita {
@@ -29,6 +30,10 @@ public class Cita {
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "id_vehiculo", nullable = false)
+    private Vehiculo vehiculo;
 
     @Column(nullable = false)
     private LocalDate fecha;

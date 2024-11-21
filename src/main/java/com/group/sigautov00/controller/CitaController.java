@@ -2,7 +2,8 @@ package com.group.sigautov00.controller;
 
 import java.util.List;
 
-// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.group.sigautov00.dto.CitaDTO;
 import com.group.sigautov00.entity.Cita;
 import com.group.sigautov00.service.CitaService;
+import com.group.sigautov00.service.VehiculoService;
 
 @RestController
 @RequestMapping("/api/citas")
 public class CitaController {
+    private static final Logger logger = LoggerFactory.getLogger(VehiculoService.class);
 
+    @Autowired
     private CitaService citaService;
 
     @GetMapping
@@ -34,17 +38,24 @@ public class CitaController {
     }
 
     @PostMapping
-    public ResponseEntity<Cita> createCita(@RequestBody CitaDTO citaDTO) {
+    public ResponseEntity<?> createCita(@RequestBody CitaDTO citaDTO) {
+        logger.warn("Creating cita with fecha: {} -->", citaDTO.toString());
+
         try {
+            logger.warn("using cita service");
             Cita savedCita = citaService.createCita(citaDTO);
             return new ResponseEntity<>(savedCita, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            logger.error("Error creating cita", e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error creando cita", e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
-        return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Error en cita controller: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
