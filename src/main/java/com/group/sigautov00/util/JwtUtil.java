@@ -2,6 +2,8 @@ package com.group.sigautov00.util;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +26,17 @@ public class JwtUtil {
     private long jwtExpiration;
     
     public String generateToken(Usuario usuario) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("personaId", usuario.getPersona().getId());
+        if (usuario.getId() != null) {
+            claims.put("clienteId", usuario.getId());
+        }
+        claims.put("email", usuario.getPersona().getEmail());
+        claims.put("names", usuario.getPersona().getNombres());
+
+
         return Jwts.builder()
-            .setSubject(usuario.getPersona().getEmail())
+            .setClaims(claims)
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
