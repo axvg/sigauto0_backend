@@ -59,6 +59,7 @@ public class VehiculoService {
 
     private VehiculoDTO convertToDTO(Vehiculo vehiculo) {
         VehiculoDTO vehiculoDTO = new VehiculoDTO();
+        vehiculoDTO.setIdVehiculo(vehiculo.getIdVehiculo());
         vehiculoDTO.setMarca(vehiculo.getMarca());
         vehiculoDTO.setModelo(vehiculo.getModelo());
         vehiculoDTO.setYear(vehiculo.getYear());
