@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,12 @@ public class Cita {
     @ManyToOne
     @JoinColumn(name = "id_vehiculo", nullable = false)
     private Vehiculo vehiculo;
+
+    // @ManyToOne
+    // @JoinColumn(name = "id_tipo_servicio", nullable = false)
+    // private TipoServicio tipoServicio;
+    @Column(nullable = false, name = "id_tipo_servicio")
+    private Long idTipoServicio;
 
     @Column(nullable = false)
     private LocalDate fecha;
