@@ -55,6 +55,7 @@ public class CitaService {
         cita.setVehiculo(vehiculo);
         cita.setFecha(citaDTO.getFecha());
         cita.setEstado(citaDTO.getEstado());
+        cita.setIdTipoServicio(citaDTO.getIdTipoServicio());
 
         return citaRepository.save(cita);
     }
