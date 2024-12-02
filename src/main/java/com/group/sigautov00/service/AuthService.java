@@ -55,14 +55,6 @@ public class AuthService {
         
         personaRepository.save(persona);
         
-        // Create Usuario
-        var usuario = Usuario.builder()
-            .persona(persona)
-            .passwordHash(passwordEncoder.encode(request.getPassword()))
-            .build();
-        
-        usuarioRepository.save(usuario);
-
         // Create Cliente
         var cliente = Cliente.builder()
             .persona(persona)
@@ -72,6 +64,17 @@ public class AuthService {
             .build();
         
         clienteRepository.save(cliente);
+
+        // Create Usuario
+        var usuario = Usuario.builder()
+            .persona(persona)
+            .cliente(cliente)
+            .passwordHash(passwordEncoder.encode(request.getPassword()))
+            .build();
+        
+        usuarioRepository.save(usuario);
+
+
 
         var token = jwtService.generateToken(usuario);
         return AuthResponseDTO.builder()

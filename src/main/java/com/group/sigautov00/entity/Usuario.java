@@ -34,7 +34,11 @@ public class Usuario {
   @OneToOne
   @JoinColumn(name = "persona_id")
   private Persona persona;
-  
+
+  @OneToOne
+  @JoinColumn(name = "cliente_id")
+  private Cliente cliente;
+
   @Column(name = "password_hash")
   private String passwordHash;
 }
