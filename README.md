@@ -1,0 +1,1 @@
+[![codecov](https://codecov.io/gh/axvg/sigauto_backend0/graph/badge.svg?token=G1ZQ7SAAXM)](https://codecov.io/gh/axvg/sigauto_backend0)
