@@ -15,6 +15,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1
+      with:
+        envkey_SPRING_SECURITY_USER_NAME: ${{ secrets.SPRING_SECURITY_USER_NAME }}
+        envkey_SPRING_SECURITY_USER_PASSWORD: ${{ secrets.SPRING_SECURITY_USER_PASSWORD }}
+        envkey_POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+        envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        file_name: .env
+
     - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
