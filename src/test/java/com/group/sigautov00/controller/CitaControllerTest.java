@@ -7,13 +7,22 @@ import com.group.sigautov00.entity.Cliente;
 import com.group.sigautov00.entity.Genero;
 import com.group.sigautov00.entity.Persona;
 import com.group.sigautov00.entity.Vehiculo;
+import com.group.sigautov00.repository.CitaRepository;
+import com.group.sigautov00.repository.ClienteRepository;
+import com.group.sigautov00.repository.PersonaRepository;
+import com.group.sigautov00.repository.UsuarioRepository;
 import com.group.sigautov00.service.CitaService;
+import com.group.sigautov00.util.JwtUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -44,17 +53,36 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-// @WebMvcTest(controllers = CitaController.class)
-// @AutoConfigureMockMvc(addFilters = false)
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(controllers = CitaController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CitaControllerTest {
     private final Logger logger=LoggerFactory.getLogger(this.getClass());
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+
+    @MockBean
     private CitaService citaService;
 
-    @InjectMocks
-    private CitaController citaController;
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private UsuarioRepository usuarioRepository;
+
+    @MockBean
+    private ClienteRepository clienteRepository;
+
+    @MockBean
+    private PersonaRepository personaRepository;
+
+    @MockBean
+    private CitaRepository citaRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private CitaDTO citaDTO;
     private Cita cita1, cita2, cita3;
@@ -172,96 +200,107 @@ public class CitaControllerTest {
     }
 
     @Test
-    public void testGetAllCitas() throws Exception {
-        List<Cita> citas = Arrays.asList(cita1, cita2, cita3);
+    @Order(1)
+    @DisplayName("Test create cita controller success")
+    public void testCreateCita_Success() throws Exception {
+        given(citaService.createCita(ArgumentMatchers.any(CitaDTO.class))).willReturn(cita1);
 
-        logger.info(">Test-GetAllCitas: ");
+        ResultActions response = mockMvc.perform(post("/api/citas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(citaDTO)));
 
-        when(citaService.getAllCitas()).thenReturn(citas);
-
-        ResponseEntity<List<Cita>> response = citaController.getAllCitas();
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(citas, response.getBody());
-        assertEquals(response.getBody().size(), citas.size());
-        verify(citaService, times(1)).getAllCitas();
+        response
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.idCita", CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.cliente.idCliente", CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.vehiculo.idVehiculo", CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.estado", CoreMatchers.is(true)));
     }
 
-
     @Test
-    void testGetAllCitas_Exception() {
-        logger.error(">Test-GetAllCitas_Exception: ");
-
-        when(citaService.getAllCitas()).thenThrow(new RuntimeException("Database error"));
-
-        ResponseEntity<List<Cita>> response = citaController.getAllCitas();
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
-
-
-    @Test
-    void testGetCitasByCliente_Success() {
-        logger.info(">Test-GetCitasByCliente_Success: ");
-
+    @Order(2)
+    @DisplayName("Test get citas por cliente controller success")
+    public void testGetCitasByCliente_Success() throws Exception {
         Long clienteId = 2L;
         List<Cita> expectedCitas = Arrays.asList(cita2);
-        when(citaService.getCitasByCliente(clienteId)).thenReturn(expectedCitas);
+        given(citaService.getCitasByCliente(clienteId)).willReturn(expectedCitas);
 
-        ResponseEntity<List<Cita>> response = citaController.getCitasByCliente(clienteId);
+        ResultActions response = mockMvc.perform(get("/api/citas/cliente/{clienteId}", clienteId)
+                .contentType(MediaType.APPLICATION_JSON));
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedCitas, response.getBody());
-        assertEquals(response.getBody().size(), expectedCitas.size());
+        response
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].idCita", CoreMatchers.is(2)))
+                .andExpect(jsonPath("$[0].cliente.idCliente", CoreMatchers.is(2)))
+                .andExpect(jsonPath("$[0].vehiculo.idVehiculo", CoreMatchers.is(2)));
+
         verify(citaService, times(1)).getCitasByCliente(clienteId);
     }
 
     @Test
-    void testGetCitasByCliente_Exception() {
+    @Order(3)
+    @DisplayName("Test get all citas controller success")
+    public void testGetCitas_Sucess() throws Exception {
+        List<Cita> expectedCitas = Arrays.asList(cita1, cita2, cita3);
+        given(citaService.getAllCitas()).willReturn(expectedCitas);
+
+        ResultActions response = mockMvc.perform(get("/api/citas")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        assertEquals(expectedCitas.size(), response.andReturn().getResponse().getContentAsString().split("idCita").length - 1);
+
+        response
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].idCita", CoreMatchers.is(1)))
+                .andExpect(jsonPath("$[1].idCita", CoreMatchers.is(2)))
+                .andExpect(jsonPath("$[2].idCita", CoreMatchers.is(3)));
+
+        verify(citaService, times(1)).getAllCitas();
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Test get citas por cliente controller exception")
+    public void testGetCitasByCliente_Exception() throws Exception {
         Long clienteId = 3L;
-        when(citaService.getCitasByCliente(clienteId)).thenThrow(new RuntimeException("Database error"));
+        given(citaService.getCitasByCliente(clienteId)).willThrow(new RuntimeException("Database error"));
 
-        ResponseEntity<List<Cita>> response = citaController.getCitasByCliente(clienteId);
+        ResultActions response = mockMvc.perform(get("/api/citas/cliente/{clienteId}", clienteId)
+                .contentType(MediaType.APPLICATION_JSON));
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        response
+                .andExpect(status().isInternalServerError());
+
+        verify(citaService, times(1)).getCitasByCliente(clienteId);
     }
 
     @Test
-    void testCreateCita_Success() {
-        when(citaService.createCita(citaDTO)).thenReturn(cita1);
+    @Order(5)
+    @DisplayName("Test get all citas controller exception")
+    public void testGetAllCitas_Exception() throws Exception {
+        given(citaService.getAllCitas()).willThrow(new RuntimeException("Database error"));
 
-        ResponseEntity<?> response = citaController.createCita(citaDTO);
+        ResultActions response = mockMvc.perform(get("/api/citas")
+                .contentType(MediaType.APPLICATION_JSON));
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(cita1.getIdTipoServicio(), ((Cita) response.getBody()).getIdTipoServicio());
-        verify(citaService, times(1)).createCita(citaDTO);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.andReturn().getResponse().getStatus());
+
+        verify(citaService, times(1)).getAllCitas();
     }
 
     @Test
-    void testCreateCita_RuntimeException() {
-        String errorMessage = "fecha invalida";
-        when(citaService.createCita(citaDTO)).thenThrow(new RuntimeException(errorMessage));
-
-        ResponseEntity<?> response = citaController.createCita(citaDTO);
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
-    void testCreateCita_GeneralException() {
+    @Order(6)
+    @DisplayName("Test create cita controller exception")
+    public void testCreateCita_GeneralException() throws Exception {
         String errorMessage = "Unexpected error";
-        when(citaService.createCita(citaDTO)).thenThrow(new RuntimeException(errorMessage));
-    
-        ResponseEntity<?> response = citaController.createCita(citaDTO);
-    
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Unexpected error", response.getBody());
+        given(citaService.createCita(ArgumentMatchers.any(CitaDTO.class))).willThrow(new RuntimeException(errorMessage));
+
+        ResultActions response = mockMvc.perform(post("/api/citas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(citaDTO)));
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.andReturn().getResponse().getStatus());
     }
 }

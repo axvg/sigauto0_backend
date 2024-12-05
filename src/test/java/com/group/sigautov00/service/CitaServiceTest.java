@@ -10,7 +10,11 @@ import com.group.sigautov00.repository.CitaRepository;
 import com.group.sigautov00.repository.ClienteRepository;
 import com.group.sigautov00.repository.VehiculoRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -27,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CitaServiceTest {
 
     @Mock
@@ -90,6 +95,8 @@ public class CitaServiceTest {
     }
 
     @Test
+    @Order(1)
+    @DisplayName("Test get all citas service")
     public void testGetAllCitas() {
         List<Cita> citas = Arrays.asList(cita);
 
@@ -103,6 +110,8 @@ public class CitaServiceTest {
     }
 
     @Test
+    @Order(2)
+    @DisplayName("Test get citas by cliente service")
     public void testGetCitasByCliente() {
         List<Cita> citas = Arrays.asList(cita);
 
@@ -116,6 +125,8 @@ public class CitaServiceTest {
     }
 
     @Test
+    @Order(3)
+    @DisplayName("Test create cita service")
     public void testCreateCita_Success() {
         when(clienteRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(cliente));
         when(vehiculoRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(vehiculo));
@@ -129,6 +140,8 @@ public class CitaServiceTest {
     }
 
     @Test
+    @Order(4)
+    @DisplayName("Test create cita service con cliente no valido")
     public void testCreateCita_ClienteNotFound() {
         when(clienteRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
 
@@ -140,6 +153,8 @@ public class CitaServiceTest {
     }
 
     @Test
+    @Order(5)
+    @DisplayName("Test create cita service con vehiculo no valido")
     public void testCreateCita_VehiculoNotFound() {
         when(clienteRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(cliente));
         when(vehiculoRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
@@ -152,6 +167,8 @@ public class CitaServiceTest {
     }
 
     @Test
+    @Order(6)
+    @DisplayName("Test create cita service con vehiculo ya tiene cita")
     public void testCreateCita_VehiculoAlreadyHasCita() {
         when(clienteRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(cliente));
         when(vehiculoRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(vehiculo));
