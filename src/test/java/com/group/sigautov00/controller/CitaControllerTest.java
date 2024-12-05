@@ -116,7 +116,7 @@ public class CitaControllerTest {
                 .direccion("calle 123")
                 .sexo(Genero.F)
                 .numeroDocumento(123456789L)
-                .email("nombre2@mail.com")
+                .email("nombre22@mail.com")
                 .telefono(1234567890L)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
